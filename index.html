@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Decentralized DNS Dashboard</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+
+<style>
+body {
+    font-family: 'Poppins', sans-serif;
+    background: linear-gradient(135deg, #1e3c72, #2a5298);
+    color: white;
+    text-align: center;
+    margin: 0;
+}
+
+/* HEADER */
+header {
+    padding: 20px;
+}
+
+/* WALLET */
+.wallet {
+    margin-bottom: 20px;
+}
+
+.wallet button {
+    padding: 10px 20px;
+    margin: 5px;
+    border-radius: 10px;
+    border: none;
+    cursor: pointer;
+}
+
+#connectWallet {
+    background: #00c6ff;
+}
+
+#disconnectWallet {
+    background: #ff4b2b;
+}
+
+/* FLOW GRID */
+.flow {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 20px;
+    padding: 20px;
+}
+
+/* STEP CARD */
+.step {
+    background: rgba(255,255,255,0.1);
+    backdrop-filter: blur(10px);
+    border-radius: 15px;
+    padding: 20px;
+    transition: 0.3s;
+}
+
+.step:hover {
+    transform: scale(1.05);
+}
+
+/* INPUT */
+input {
+    width: 90%;
+    padding: 10px;
+    margin: 8px;
+    border-radius: 8px;
+    border: none;
+}
+
+/* BUTTON */
+button {
+    padding: 10px;
+    border-radius: 8px;
+    border: none;
+    cursor: pointer;
+}
+
+/* RESULT */
+#result {
+    margin-top: 20px;
+    font-size: 18px;
+}
+
+/* HISTORY */
+#historyBox {
+    margin: 20px;
+    padding: 15px;
+    background: rgba(0,0,0,0.3);
+    border-radius: 10px;
+    max-height: 200px;
+    overflow-y: auto;
+}
+
+/* LOADER */
+#loader {
+    display: none;
+    margin-top: 10px;
+}
+</style>
+</head>
+
+<body>
+
+<header>
+<h1>🚀 Decentralized DNS Dashboard</h1>
+</header>
+
+<!-- WALLET -->
+<div class="wallet">
+<button id="connectWallet">🔗 Connect Wallet</button>
+<button id="disconnectWallet" style="display:none;">❌ Disconnect</button>
+<p id="accountInfo"></p>
+</div>
+
+<!-- FLOW -->
+<div class="flow">
+
+<!-- REGISTER -->
+<div class="step">
+<h2>Step 1: Register Domain</h2>
+<form id="registerForm">
+<input name="domain" placeholder="Domain">
+<input name="value" placeholder="IP Address">
+<input type="hidden" name="owner" id="owner">
+<button>Register</button>
+</form>
+</div>
+
+<!-- UPDATE -->
+<div class="step">
+<h2>Step 2: Update Domain</h2>
+<form id="updateForm">
+<input name="domain" placeholder="Domain">
+<input name="new_value" placeholder="New Value">
+<input name="owner" placeholder="Owner">
+<button>Update</button>
+</form>
+</div>
+
+<!-- TRANSFER -->
+<div class="step">
+<h2>Step 3: Transfer Ownership</h2>
+<form id="transferForm">
+<input name="domain" placeholder="Domain">
+<input name="new_owner" placeholder="New Owner">
+<input name="current_owner" placeholder="Current Owner">
+<button>Transfer</button>
+</form>
+</div>
+
+<!-- RESOLVE -->
+<div class="step">
+<h2>Step 4: Resolve Domain</h2>
+<form id="resolveForm">
+<input name="domain" placeholder="Domain">
+<button>Resolve</button>
+</form>
+</div>
+
+</div>
+
+<!-- LOADER -->
+<div id="loader">⏳ Processing...</div>
+
+<!-- RESULT -->
+<div id="result"></div>
+
+<!-- HISTORY -->
+<div id="historyBox">
+<h3>📊 Activity History</h3>
+</div>
+
+<script>
+
+// WALLET CONNECT
+let userAccount = null;
+
+document.getElementById("connectWallet").onclick = async () => {
+    if (window.ethereum) {
+        const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
+
+        userAccount = accounts[0];
+
+        document.getElementById("accountInfo").innerText =
+            "Connected: " + userAccount;
+
+        document.getElementById("connectWallet").style.display = "none";
+        document.getElementById("disconnectWallet").style.display = "inline";
+
+        document.getElementById("owner").value = userAccount;
+    }
+};
+
+// DISCONNECT
+document.getElementById("disconnectWallet").onclick = () => {
+    userAccount = null;
+
+    document.getElementById("accountInfo").innerText = "";
+    document.getElementById("connectWallet").style.display = "inline";
+    document.getElementById("disconnectWallet").style.display = "none";
+};
+
+// FORM FUNCTION
+async function sendForm(id, url) {
+    document.getElementById(id).onsubmit = async (e) => {
+        e.preventDefault();
+
+        const data = new FormData(e.target);
+
+        document.getElementById("loader").style.display = "block";
+
+        const res = await fetch(url, {
+            method: "POST",
+            body: data
+        });
+
+        const result = await res.json();
+
+        document.getElementById("result").innerText = result.result;
+
+        addHistory(result.result);
+
+        document.getElementById("loader").style.display = "none";
+    };
+}
+
+// HISTORY
+function addHistory(msg) {
+    const box = document.getElementById("historyBox");
+    const item = document.createElement("div");
+    item.innerText = msg;
+    box.appendChild(item);
+}
+
+// CONNECT FORMS
+sendForm("registerForm", "/register");
+sendForm("updateForm", "/update");
+sendForm("transferForm", "/transfer");
+sendForm("resolveForm", "/resolve");
+
+</script>
+
+</body>
+</html>
