@@ -59,6 +59,7 @@ def resolve():
     return jsonify({'result': "❌ Not found"})
 
 
-if __name__ == '__main__':
-    contract.register_domain("example.com", "A", "1.1.1.1", "owner1")
-    app.run(debug=True)
+import os
+
+if __name__ == "__main__":
+    app.run(host="0.0.0.0", port=int(os.environ.get("PORT", 5000)))
