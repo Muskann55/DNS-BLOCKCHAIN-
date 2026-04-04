@@ -1,2 +1,1 @@
-# DNS-BLOCKCHAIN-
-# Decentralized DNS System  ## Overview This project simulates a decentralized DNS system using multiple nodes.  ## Features - Register domain names - Resolve domain to IP - Distributed storage simulation  ## API Endpoints  POST /register   GET /resolve   GET /all    ## Assumptions - Nodes are simulated (no real network) .
+This project focuses on backend design, API clarity, and system architecture rather than production complexity.This project implements a decentralized DNS system with basic security considerations, focusing on clean backend design, well-structured APIs, and clear system architecture rather than unnecessary production complexity.
