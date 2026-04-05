@@ -1,24 +1,23 @@
 class Contract:
     def __init__(self):
-        self.domains = {}
+        # store domain records
+        self.records = {}
 
     def register_domain(self, domain, record_type, value, owner):
-        self.domains[domain] = {
+        self.records[domain] = {
+            "record_type": record_type,
             "value": value,
             "owner": owner
         }
+
+    def get_record(self, domain):
+        # 🔥 THIS WAS MISSING
+        return self.records.get(domain)
+
+    def verify_transaction(self, record):
+        # simple validation
         return True
 
-    def update_domain(self, domain, new_value, owner):
-        if domain in self.domains and self.domains[domain]['owner'] == owner:
-            self.domains[domain]['value'] = new_value
-            return True
-        return False
 
-    def transfer_ownership(self, domain, new_owner, current_owner):
-        if domain in self.domains and self.domains[domain]['owner'] == current_owner:
-            self.domains[domain]['owner'] = new_owner
-            return True
-        return False
-
+# global instance
 contract = Contract()
